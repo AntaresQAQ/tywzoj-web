@@ -45,6 +45,8 @@ jspm_packages
 
 # Upload directory
 /uploads/
+uploads
+uploads/
 
 
 # Created by https://www.gitignore.io/api/vim
