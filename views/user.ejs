@@ -50,6 +50,14 @@
                                            <div class="ui bottom attached segment"><%= show_user.username %><% if (show_user.nameplate) { %><%- show_user.nameplate %><% } %></div>
                                         </div>
                                     </div>
+                                    <% if (show_user.nickname) { %>
+                                      <div class="row">
+                                          <div class="column">
+                                             <h4 class="ui top attached block header">昵称/备注名</h4>
+                                             <div class="ui bottom attached segment"><%= show_user.nickname %></div>
+                                          </div>
+                                      </div>
+                                    <% } %>
                                     <% if (show_user.emailVisible) { %>
                                       <div class="row">
                                           <div class="column">

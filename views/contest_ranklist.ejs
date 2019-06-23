@@ -14,6 +14,7 @@
             <tr>
                 <th>#</th>
                 <th>用户名</th>
+                <th>昵称/备注名</th>
                 <% if (contest.type === 'acm') { %>
                   <th>通过数量</th>
                   <th>罚时</th>
@@ -82,6 +83,7 @@
                   </div>
                 </td>
                 <td><a href="<%= syzoj.utils.makeUrl(['user', item.user.id]) %>"><%= item.user.username %></a><% if (item.user.nameplate) { %><%- item.user.nameplate %><% } %></td>
+                <td><% if (item.user.nickname) { %><%- item.user.nickname %><% } %></td>
                 <% if (contest.type === 'acm') { %>
                   <td>
                     <span class="score score_<%= parseInt((item.player.score / ranklist[0].player.score * 10) || 0) %>">

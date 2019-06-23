@@ -14,6 +14,10 @@
       <div class="field">
 	    	<label for="username">用户名</label>
 	    	<input type="text" id="username" name="username" value="<%= edited_user.username %>"<% if (!user.allowedManage) { %> readonly<% } %>>
+      </div>
+      <div class="field">
+	    	<label for="username">昵称/备注名</label>
+	    	<input type="text" id="nickname" name="nickname" value="<%= edited_user.nickname %>" >
 	    </div>
       <div class="field">
 	    	<label for="sex">性别</label>

@@ -28,7 +28,8 @@
           <thead>
             <tr>
 	            <th style="width: 50px; ">#</th>
-	            <th style="width: 170px; ">用户名</th>
+              <th style="width: 150px; ">用户名</th>
+              <th style="width: 150px; ">昵称/备注名</th>
 	            <th>个性签名</th>
             </tr>
           </thead>
@@ -53,6 +54,7 @@
                 <tr>
                     <td><b><%= i %></b></td>
                     <td><a href="<%= syzoj.utils.makeUrl(['user', user.id]) %>"><%= user.username %></a><% if (user.nameplate) { %><%- user.nameplate %><% } %></td>
+                    <td><% if (user.nickname) { %><%- user.nickname %><% } %></td>
                     <td style="font-content">
                       <script id="user-infomation-script-<%= i %>">
                       (function () {
