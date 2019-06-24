@@ -186,12 +186,15 @@ app.post('/user/:id/edit', async (req, res) => {
       let privileges = req.body.privileges;
       await user.setPrivileges(privileges);
     }
+    
+    if (res.locals.user && res.locals.user.is_admin) {
+      user.download_data = (req.body.download_data === 'on');
+    } 
 
     user.nickname = req.body.nickname;
     user.information = req.body.information;
     user.sex = req.body.sex;
     user.public_email = (req.body.public_email === 'on');
-    user.download_data = (req.body.download_data === 'on');
     user.prefer_formatted_code = (req.body.prefer_formatted_code === 'on');
 
     await user.save();
