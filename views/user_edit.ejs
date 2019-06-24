@@ -95,7 +95,7 @@
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox" >
           <input id = "download_data" name = "download_data" <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"<% if (edited_user.download_data) { %> checked<% } %>>
-          <label>数据下载</label>
+          <label>数据下载</label> <!-- 这个比较特殊注意一下，和前面几个不一样 -->
         </div>
       </div>
       <div style="text-align: center; margin-top: 30px; ">
