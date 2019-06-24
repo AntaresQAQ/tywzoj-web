@@ -162,7 +162,7 @@ app.post('/user/:id/edit', async (req, res) => {
     user = await User.findById(id);
     if (!user) throw new ErrorMessage('无此用户。');
 
-    if (user.is_admin && res.id != user.id) throw new ErrorMessage('您没有权限进行此操作。');
+    if (user.is_admin && res.id !== user.id) throw new ErrorMessage('您没有权限进行此操作。');
 
     let allowedEdit = await user.isAllowedEditBy(res.locals.user);
     if (!allowedEdit) throw new ErrorMessage('您没有权限进行此操作。');
