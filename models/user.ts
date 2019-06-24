@@ -44,6 +44,9 @@ export default class User extends Model {
   @TypeORM.Column({ nullable: true, type: "boolean" })
   is_admin: boolean;
 
+  @TypeORM.Column({ nullable: true, type: "boolean", default: false })
+  download_data: boolean;
+
   @TypeORM.Index()
   @TypeORM.Column({ nullable: true, type: "boolean" })
   is_show: boolean;

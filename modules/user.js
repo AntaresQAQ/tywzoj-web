@@ -191,6 +191,7 @@ app.post('/user/:id/edit', async (req, res) => {
     user.information = req.body.information;
     user.sex = req.body.sex;
     user.public_email = (req.body.public_email === 'on');
+    user.download_data = (req.body.download_data === 'on');
     user.prefer_formatted_code = (req.body.prefer_formatted_code === 'on');
 
     await user.save();
