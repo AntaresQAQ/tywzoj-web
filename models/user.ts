@@ -85,7 +85,7 @@ export default class User extends Model {
   async isAllowedEditBy(user) {
     if (!user) return false;
     if (this.is_admin && this.id !== user.id) return false;
-    if ((await this.hasPrivilege('mamage_user')) && this.id !== user.id && !user.is_admin) {
+    if ((await this.hasPrivilege('manage_user')) && this.id !== user.id && !user.is_admin) {
       return false;
     }
     if (await user.hasPrivilege('manage_user')) return true;
