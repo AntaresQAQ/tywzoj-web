@@ -225,7 +225,8 @@ function createTask(taskId) {
 exports.createTask = createTask;
 function updateCompileStatus(taskId, result) {
     if (debug) winston.debug(`Updating compilation status for #${taskId}`);
-    compiledList[taskId] = { result: result.status === interfaces.TaskStatus.Done ? 'Submitted' : 'Compile Error' };
+    //compiledList[taskId] = { result: result.status === interfaces.TaskStatus.Done ? 'Submitted' : 'Compile Error' };
+    compiledList[taskId] = { result: 'Submitted' };
     compileProgressNamespace.to(taskId.toString()).emit('finish', {
         taskId: taskId,
         result: compiledList[taskId]
