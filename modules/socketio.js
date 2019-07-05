@@ -50,7 +50,7 @@ function processOverallResult(source, config) {
     };
 }
 function getCompileStatus(status) {
-    if (["System Error", "Compile Error", "No Testdata"].includes(status)) {
+    if (["System Error", "No Testdata"].includes(status)) {
         return status;
     }
     else {
