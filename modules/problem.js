@@ -199,6 +199,8 @@ app.get('/problem/:id', async (req, res) => {
     let problem = await Problem.findById(id);
     if (!problem) throw new ErrorMessage('无此题目。');
 
+    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+
     if (!await problem.isAllowedUseBy(res.locals.user)) {
       throw new ErrorMessage('您没有权限进行此操作。');
     }
