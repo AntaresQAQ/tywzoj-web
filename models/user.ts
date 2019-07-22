@@ -211,4 +211,15 @@ export default class User extends Model {
 
     return null;
   }
+
+  async delete() {
+    const entityManager = TypeORM.getManager();
+
+    await entityManager.query('DELETE FROM `user`                  WHERE `id`      = ' + this.id);
+    await entityManager.query('DELETE FROM `judge_state`           WHERE `user_id` = ' + this.id);
+    await entityManager.query('DELETE FROM `submission_statistics` WHERE `user_id` = ' + this.id);
+    await entityManager.query('DELETE FROM `user_privilege`        WHERE `user_id` = ' + this.id);
+
+    await this.destroy();
+  }
 }

@@ -218,3 +218,23 @@ app.post('/user/:id/edit', async (req, res) => {
     });
   }
 });
+
+app.post('/user/:id/delete', async (req, res) => {
+  try {
+    let id = parseInt(req.params.id);
+    let user = await User.findById(id);
+    if (!user) throw new ErrorMessage('无此用户。');
+
+    if (user.is_admin) throw new ErrorMessage('您不能删除管理员账户。');
+    if (!user.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
+
+    await user.delete();
+
+    res.redirect('/');
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
