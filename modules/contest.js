@@ -10,7 +10,7 @@ const { getSubmissionInfo, getRoughResult, processOverallResult } = require('../
 
 app.get('/contests', async (req, res) => {
   try {
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
     let where;
     if (res.locals.user && (await res.locals.user.hasPrivilege('manage_contest'))) where = {}
     else where = { is_public: true };
@@ -119,6 +119,25 @@ app.post('/contest/:id/edit', async (req, res) => {
   }
 });
 
+app.post('/contest/:id/delete', async (req, res) => {
+  try {
+    let id = parseInt(req.params.id);
+    let contest = await Contest.findById(id);
+    if (!contest) throw new ErrorMessage('无此比赛。');
+
+    if (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest'))) throw new ErrorMessage('您没有权限进行此操作。');
+
+    await contest.delete();
+    res.redirect(syzoj.utils.makeUrl(['contests']));
+
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
+
 app.get('/contest/:id', async (req, res) => {
   try {
     const curUser = res.locals.user;
@@ -126,7 +145,7 @@ app.get('/contest/:id', async (req, res) => {
 
     let contest = await Contest.findById(contest_id);
     if (!contest) throw new ErrorMessage('无此比赛。');
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
     if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
 
     const isSupervisior = await contest.isSupervisior(curUser);
@@ -349,7 +368,7 @@ app.get('/contest/:id/submissions', async (req, res) => {
         }));
       } else if (req.body.language === 'non-submit-answer') {
         query.andWhere('language != :language', { language: '' })
-             .andWhere('language IS NOT NULL');
+          .andWhere('language IS NOT NULL');
       } else {
         query.andWhere('language = :language', { language: req.body.language })
       }
@@ -370,7 +389,7 @@ app.get('/contest/:id/submissions', async (req, res) => {
     }
 
     query.andWhere('type = 1')
-         .andWhere('type_info = :contest_id', { contest_id });
+      .andWhere('type_info = :contest_id', { contest_id });
 
     let judge_state, paginate;
 

@@ -150,4 +150,15 @@ export default class Contest extends Model {
     if (!now) now = syzoj.utils.getCurrentDate();
     return now >= this.end_time;
   }
+
+  async delete() {
+    const entityManager = TypeORM.getManager();
+
+    await entityManager.query('DELETE FROM `contest`              WHERE `id` = ' + this.id);
+    await entityManager.query('DELETE FROM `contest_player`       WHERE `id` = ' + this.id);
+    await entityManager.query('DELETE FROM `contest_ranklist`     WHERE `id` = ' + this.id);
+
+    await this.destroy();
+  }
+
 }
