@@ -7,7 +7,8 @@ const ContestPlayer = syzoj.model('contest_player');
 // Ranklist
 app.get('/ranklist', async (req, res) => {
   try {
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const sort = req.query.sort || syzoj.config.sorting.ranklist.field;
     const order = req.query.order || syzoj.config.sorting.ranklist.order;
     if (!['ac_num', 'rating', 'id', 'username'].includes(sort) || !['asc', 'desc'].includes(order)) {
@@ -76,7 +77,7 @@ app.post('/logout', async (req, res) => {
 // User page
 app.get('/user/:id', async (req, res) => {
   try {
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
     let id = parseInt(req.params.id);
     let user = await User.findById(id);
     if (!user) throw new ErrorMessage('无此用户。');
@@ -188,10 +189,11 @@ app.post('/user/:id/edit', async (req, res) => {
       let privileges = req.body.privileges;
       await user.setPrivileges(privileges);
     }
-    
+
     if (res.locals.user && res.locals.user.is_admin) {
+      user.is_available = (req.body.is_available === 'on');
       user.download_data = (req.body.download_data === 'on');
-    } 
+    }
 
     user.nickname = req.body.nickname;
     user.information = req.body.information;

@@ -22,7 +22,8 @@ const displayConfig = {
 // s is JudgeState
 app.get('/submissions', async (req, res) => {
   try {
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const curUser = res.locals.user;
 
     let query = JudgeState.createQueryBuilder();
@@ -72,7 +73,7 @@ app.get('/submissions', async (req, res) => {
         isFiltered = true;
       } else if (req.query.language === 'non-submit-answer') {
         query.andWhere('language != :language', { language: '' })
-             .andWhere('language IS NOT NULL');
+          .andWhere('language IS NOT NULL');
         isFiltered = true;
       } else {
         query.andWhere('language = :language', { language: req.query.language });
@@ -154,7 +155,8 @@ app.get('/submissions', async (req, res) => {
 
 app.get('/submission/:id', async (req, res) => {
   try {
-    if(!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const id = parseInt(req.params.id);
     const judge = await JudgeState.findById(id);
     if (!judge) throw new ErrorMessage("提交记录 ID 不正确。");

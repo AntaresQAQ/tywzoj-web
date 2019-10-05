@@ -41,6 +41,9 @@ export default class User extends Model {
   @TypeORM.Column({ nullable: true, type: "integer" })
   submit_num: number;
 
+  @TypeORM.Column({ nullable: true, type: "boolean", default: false })
+  is_available: boolean;
+
   @TypeORM.Column({ nullable: true, type: "boolean" })
   is_admin: boolean;
 
@@ -94,11 +97,11 @@ export default class User extends Model {
 
   getQueryBuilderForACProblems() {
     return JudgeState.createQueryBuilder()
-                     .select(`DISTINCT(problem_id)`)
-                     .where('user_id = :user_id', { user_id: this.id })
-                     .andWhere('status = :status', { status: 'Accepted' })
-                     .andWhere('type != 1')
-                     .orderBy({ problem_id: 'ASC' })
+      .select(`DISTINCT(problem_id)`)
+      .where('user_id = :user_id', { user_id: this.id })
+      .andWhere('status = :status', { status: 'Accepted' })
+      .andWhere('type != 1')
+      .orderBy({ problem_id: 'ASC' })
   }
 
   async refreshSubmitInfo() {
@@ -173,10 +176,12 @@ export default class User extends Model {
     let addPrivileges = newPrivileges.filter(x => !oldPrivileges.includes(x));
 
     for (let privilege of delPrivileges) {
-      let obj = await UserPrivilege.findOne({ where: {
-        user_id: this.id,
-        privilege: privilege
-      } });
+      let obj = await UserPrivilege.findOne({
+        where: {
+          user_id: this.id,
+          privilege: privilege
+        }
+      });
 
       await obj.destroy();
     }

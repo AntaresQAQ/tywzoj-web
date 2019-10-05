@@ -3,7 +3,7 @@ let ProblemTag = syzoj.model('problem_tag');
 app.get('/problems/tag/:id/edit', async (req, res) => {
   try {
     if (!res.locals.user || !await res.locals.user.hasPrivilege('manage_problem_tag')) throw new ErrorMessage('您没有权限进行此操作。');
-
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     let id = parseInt(req.params.id) || 0;
     let tag = await ProblemTag.findById(id);
 
@@ -26,7 +26,7 @@ app.get('/problems/tag/:id/edit', async (req, res) => {
 app.post('/problems/tag/:id/edit', async (req, res) => {
   try {
     if (!res.locals.user || !await res.locals.user.hasPrivilege('manage_problem_tag')) throw new ErrorMessage('您没有权限进行此操作。');
-
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     let id = parseInt(req.params.id) || 0;
     let tag = await ProblemTag.findById(id);
 

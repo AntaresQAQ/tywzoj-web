@@ -11,6 +11,7 @@ const { getSubmissionInfo, getRoughResult, processOverallResult } = require('../
 app.get('/contests', async (req, res) => {
   try {
     if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     let where;
     if (res.locals.user && (await res.locals.user.hasPrivilege('manage_contest'))) where = {}
     else where = { is_public: true };
@@ -38,7 +39,7 @@ app.get('/contests', async (req, res) => {
 app.get('/contest/:id/edit', async (req, res) => {
   try {
     if (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest'))) throw new ErrorMessage('您没有权限进行此操作。');
-
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     let contest_id = parseInt(req.params.id);
     let contest = await Contest.findById(contest_id);
     if (!contest) {
@@ -68,6 +69,7 @@ app.get('/contest/:id/edit', async (req, res) => {
 app.post('/contest/:id/edit', async (req, res) => {
   try {
     if (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest'))) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
 
     let contest_id = parseInt(req.params.id);
     let contest = await Contest.findById(contest_id);
@@ -126,6 +128,7 @@ app.post('/contest/:id/delete', async (req, res) => {
     if (!contest) throw new ErrorMessage('无此比赛。');
 
     if (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest'))) throw new ErrorMessage('您没有权限进行此操作。');
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
 
     await contest.delete();
     res.redirect(syzoj.utils.makeUrl(['contests']));
@@ -146,6 +149,7 @@ app.get('/contest/:id', async (req, res) => {
     let contest = await Contest.findById(contest_id);
     if (!contest) throw new ErrorMessage('无此比赛。');
     if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
 
     const isSupervisior = await contest.isSupervisior(curUser);
@@ -251,6 +255,7 @@ app.get('/contest/:id/ranklist', async (req, res) => {
 
     if (!contest) throw new ErrorMessage('无此比赛。');
     if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     if ([contest.allowedSeeingResult() && contest.allowedSeeingOthers(),
     contest.isEnded(),
     await contest.isSupervisior(curUser)].every(x => !x))
@@ -322,7 +327,7 @@ app.get('/contest/:id/submissions', async (req, res) => {
     let contest_id = parseInt(req.params.id);
     let contest = await Contest.findById(contest_id);
     if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
-
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     if (contest.isEnded()) {
       res.redirect(syzoj.utils.makeUrl(['submissions'], { contest: contest_id }));
       return;
@@ -451,6 +456,7 @@ app.get('/contest/submission/:id', async (req, res) => {
     if (!judge) throw new ErrorMessage("提交记录 ID 不正确。");
     const curUser = res.locals.user;
     if ((!curUser) || judge.user_id !== curUser.id) throw new ErrorMessage("您没有权限执行此操作。");
+    if (!curUser.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
 
     if (judge.type !== 1) {
       return res.redirect(syzoj.utils.makeUrl(['submission', id]));
@@ -502,6 +508,8 @@ app.get('/contest/:id/problem/:pid', async (req, res) => {
     if (!contest) throw new ErrorMessage('无此比赛。');
     const curUser = res.locals.user;
 
+    if (!curUser || !curUser.is_available) throw new ErrorMessage('您没有权限。');
+
     let problems_id = await contest.getProblems();
 
     let pid = parseInt(req.params.pid);
@@ -546,6 +554,8 @@ app.get('/contest/:id/problem/:pid', async (req, res) => {
 
 app.get('/contest/:id/:pid/download/additional_file', async (req, res) => {
   try {
+    if (!res.locals.user || !res.locals.user.is_available) throw new ErrorMessage('您没有权限。');
+
     let id = parseInt(req.params.id);
     let contest = await Contest.findById(id);
     if (!contest) throw new ErrorMessage('无此比赛。');
