@@ -163,7 +163,7 @@
 </script>
 <script type="text/javascript">
   var editors = {
-    information: { defaultValue: <% - serializejs(edited_user.information) %> },
+    information: { defaultValue: <%- serializejs(edited_user.information) %> },
   };
 
   window.onEditorLoaded(function () {
@@ -211,8 +211,7 @@
         }
       });
 <% } %>
-
-	return true;
+	  return true;
   }
 </script>
 <script>
