@@ -45,6 +45,34 @@ app.get('/find_user', async (req, res) => {
   }
 });
 
+// userlist
+app.get('/userlist', async (req, res) => {
+  try {
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
+    const sort = req.query.sort || syzoj.config.sorting.userlist.field;
+    const order = req.query.order || syzoj.config.sorting.userlist.order;
+    if (!['register_time', 'id', 'username'].includes(sort) || !['asc', 'desc'].includes(order)) {
+      throw new ErrorMessage('错误的排序参数。');
+    }
+    let paginate = syzoj.utils.paginate(await User.countForPagination({ is_show: true }), req.query.page, syzoj.config.page.userlist);
+    let userlist = await User.queryPage(paginate, { is_show: true }, { [sort]: order.toUpperCase() });
+    await userlist.forEachAsync(async x => x.renderInformation());
+
+    res.render('userlist', {
+      userlist: userlist,
+      paginate: paginate,
+      curSort: sort,
+      curOrder: order === 'asc'
+    });
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
+
 // Login
 app.get('/login', async (req, res) => {
   if (res.locals.user) {
@@ -232,7 +260,10 @@ app.post('/user/:id/delete', async (req, res) => {
     if (user.is_admin) throw new ErrorMessage('您不能删除管理员账户。');
     if (!user.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
 
-    await user.delete();
+    //await user.delete();
+    user.is_show=false;
+    user.is_available=false;
+    await user.save();
 
     res.redirect('/');
   } catch (e) {
