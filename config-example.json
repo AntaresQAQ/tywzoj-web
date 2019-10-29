@@ -133,5 +133,6 @@
   "username_regex": "^[a-zA-Z0-9\\-\\_]+$",
   "site_for_download": "",
   "renderer_cache_size": "30000",
-  "icon_url": ""
+  "icon_url": "",
+  "filing_information": ""
 }

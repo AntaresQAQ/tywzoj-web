@@ -1,6 +1,10 @@
 </div>
     <div class="ui vertical footer segment" style="margin-top: 15px; ">
       <div class="ui center aligned container">
+        <% if(syzoj.config.filing_information) { %>
+        <span><a href="http://www.beian.miit.gov.cn/" target="_blank" style="color: #999;"><%= syzoj.config.filing_information %></a></span>
+        &nbsp;
+        <% } %>
         <span style="color: #999;"><%= syzoj.config.title %> Powered by <a href="https://github.com/syzoj/syzoj" target="_blank">SYZOJ</a>.</span>
       </div>
     </div>
