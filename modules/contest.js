@@ -272,7 +272,12 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     await contest.loadRelationships();
 
     let players_id = [];
-    for (let i = 1; i <= contest.ranklist.ranklist.player_num; i++) players_id.push(contest.ranklist.ranklist[i]);
+    for (let i = 1; i <= contest.ranklist.ranklist.player_num; i++) {
+        let player_id = contest.ranklist.ranklist[i];
+        let player =await ContestPlayer.findById(player_id);
+        if(!await User.findById(player.user_id)) continue;
+        players_id.push(player_id);
+    }
 
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.findById(player_id);
