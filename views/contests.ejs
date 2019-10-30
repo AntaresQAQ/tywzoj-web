@@ -1,20 +1,33 @@
 <% this.title = '比赛' %>
 <% include header %>
 <div class="padding">
-    <% if (contests.length) { %>
-    <% if (allowedMenageContest) { %>
-    <form class="ui mini form">
-      <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
-        <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button" style="margin-left: auto; ">
-          <i class="ui icon write"></i>
+  <div class="ui mini">
+    <div class="inline fields" style="margin-bottom: 25px; white-space: nowrap; ">
+      <div class="ui labeled icon mini blue dropdown button" id="select_category"><i class="angle down icon"></i> 选择组别
+        <div class="menu">
+          <a class="item" href="/contests?category=all">All</a>
+          <a class="item" href="/contests?category=junior">Junior</a>
+          <a class="item" href="/contests?category=senior">Senior</a>
+        </div>
+      </div>
+      <script>
+        $(function () {
+          $('#select_category').dropdown();
+        });
+      </script>
+      <% if (allowedMenageContest && contests.length) { %>
+       <a href="<%= syzoj.utils.makeUrl(['contest', 0, 'edit']) %>" class="ui mini labeled icon right floated button" style="margin-left: auto; ">
+        <i class="ui icon write"></i>
           添加比赛
         </a>
-     </div>
-    </form>
-    <% } %>
+      <% } %>
+    </div>
+  </div>
+    <% if (contests.length) { %>
     <table class="ui very basic center aligned table">
       <thead>
         <tr>
+          <th>组别</th>
           <th>比赛名称</th>
           <th>开始时间</th>
           <th>结束时间</th>
@@ -28,6 +41,11 @@
           let tag = '';
         %>
         <tr>
+          <% if(contest.category) { %>
+          <td><%=contest.category %></td>
+          <% } else { %>
+          <td>未分组</td>
+          <% } %>
           <% if (now < contest.start_time) { %>
             <% tag = '<span class="ui header"><div class="ui mini red label">未开始</div></span>' %>
           <% } else if (now >= contest.start_time && now < contest.end_time) { %>

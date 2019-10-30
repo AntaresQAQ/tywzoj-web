@@ -54,6 +54,21 @@
                 </div>
               </div>
             </div>
+            <div class="inline fields">
+                <label>组别</label>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="category" id="category-junior" value="Junior"<% if (contest.category === 'Junior') { %> checked="checked"<% } %>>
+                    <label for="category-junior">Junior</label>
+                  </div>
+                </div>
+                <div class="field">
+                  <div class="ui radio checkbox">
+                    <input type="radio" name="category" id="category-senior" value="Senior"<% if (contest.category === 'Senior') { %> checked="checked"<% } %>>
+                    <label for="category-senior">Senior</label>
+                  </div>
+                </div>
+              </div>
             <div class="field">
                 <label>排行参数（格式：<code>{ "题目 ID": 分值倍数 }</code>）</label>
                 <input type="text" name="ranking_params" value="<%= contest.ranklist ? JSON.stringify(contest.ranklist.ranking_params) : '' %>">

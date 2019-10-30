@@ -12,10 +12,17 @@ app.get('/contests', async (req, res) => {
   try {
     if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
     if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
+    const query_category = req.query.category || 'all' 
+    if (!['junior','senior','all'].includes(query_category)) throw new ErrorMessage('错误的组别选项。');
     let where;
     if (res.locals.user && (await res.locals.user.hasPrivilege('manage_contest'))) where = {}
     else where = { is_public: true };
 
+    if(query_category === 'junior')
+      where['category'] = "Junior";
+    else if(query_category === 'senior')
+      where['category'] = "Senior";
+    
     let paginate = syzoj.utils.paginate(await Contest.countForPagination(where), req.query.page, syzoj.config.page.contest);
     let contests = await Contest.queryPage(paginate, where, {
       start_time: 'DESC'
@@ -98,6 +105,7 @@ app.post('/contest/:id/edit', async (req, res) => {
     contest.ranklist_id = ranklist.id;
 
     if (!req.body.title.trim()) throw new ErrorMessage('比赛名不能为空。');
+    if (!['Junior', 'Senior'].includes(req.body.category)) throw new ErrorMessage('无效的组别。');
     contest.title = req.body.title;
     contest.subtitle = req.body.subtitle;
     if (!Array.isArray(req.body.problems)) req.body.problems = [req.body.problems];
@@ -109,7 +117,7 @@ app.post('/contest/:id/edit', async (req, res) => {
     contest.end_time = syzoj.utils.parseDate(req.body.end_time);
     contest.is_public = req.body.is_public === 'on';
     contest.hide_statistics = req.body.hide_statistics === 'on';
-
+    contest.category = req.body.category;
     await contest.save();
 
     res.redirect(syzoj.utils.makeUrl(['contest', contest.id]));

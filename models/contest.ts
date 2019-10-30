@@ -60,6 +60,9 @@ export default class Contest extends Model {
   @TypeORM.Column({ nullable: true, type: "boolean" })
   hide_statistics: boolean;
 
+  @TypeORM.Column({ nullable: true, type: "text" })
+  category: string;
+
   holder?: User;
   ranklist?: ContestRanklist;
 
