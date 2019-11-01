@@ -224,6 +224,7 @@ export default class User extends Model {
     await entityManager.query('DELETE FROM `judge_state`           WHERE `user_id` = ' + this.id);
     await entityManager.query('DELETE FROM `submission_statistics` WHERE `user_id` = ' + this.id);
     await entityManager.query('DELETE FROM `user_privilege`        WHERE `user_id` = ' + this.id);
+    await entityManager.query('DELETE FROM `submission_statistics` WHERE `user_id` = ' + this.id);
 
     await this.destroy();
   }
