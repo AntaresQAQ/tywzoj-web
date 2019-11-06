@@ -245,7 +245,8 @@ app.get('/contest/:id', async (req, res) => {
       contest: contest,
       problems: problems,
       hasStatistics: hasStatistics,
-      isSupervisior: isSupervisior
+      isSupervisior: isSupervisior,
+      ended: contest.ended
     });
   } catch (e) {
     syzoj.log(e);
@@ -320,6 +321,81 @@ app.get('/contest/:id/ranklist', async (req, res) => {
     });
   }
 });
+
+app.get('/contest/:id/endedranklist', async (req, res) => {
+  try {
+    let contest_id = parseInt(req.params.id);
+    let contest = await Contest.findById(contest_id);
+    const curUser = res.locals.user;
+
+    if (!contest) throw new ErrorMessage('无此比赛。');
+    if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
+    if (!contest.isEnded()) throw new ErrorMessage('比赛还未结束！');
+
+    await contest.loadRelationships();
+
+    let problems_id = await contest.getProblems();
+    let problems = await problems_id.mapAsync(async id => await Problem.findById(id));
+
+    let players_id = [];
+    for (let i = 1; i <= contest.ranklist.ranklist.player_num; i++) {
+        let player_id = contest.ranklist.ranklist[i];
+        let player =await ContestPlayer.findById(player_id);
+        if(!await User.findById(player.user_id)) continue;
+        players_id.push(player_id);
+    }
+
+    let ranklist = await players_id.mapAsync(async player_id => {
+      let player = await ContestPlayer.findById(player_id);
+
+      for (let problem_id in player.score_details) {
+        //player.score_details[problem_id].judge_state = await JudgeState.findById(player.score_details[problem_id].judge_id);
+        // player.score_details[problem_id].judge_state;
+        /*** XXX: Clumsy duplication, see ContestRanklist::updatePlayer() ***/
+        //let multiplier = (contest.ranklist.ranking_params || {})[i] || 1.0;
+        //player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(player.score_details[i].score * multiplier);
+        //player.score += player.score_details[i].weighted_score;
+        
+        let query= JudgeState.createQueryBuilder();
+        query.where("user_id=:user_id", {user_id: player.user_id})
+             .andWhere("problem_id=:problem_id", {problem_id: problem_id});
+        const queryResult = await JudgeState.queryPage(query);
+        let max_score = 0;
+        for(let item in queryResult) {
+          if (item.score > max_score)
+          {
+            max_score=item.score;
+            player.score_details[problem_id].ended_score=item.score;
+            player.score_details[problem_id].judge_id=item.id;
+            player.score_details[problem_id].judge_state=item;
+          }  
+        }
+      }
+
+      let user = await User.findById(player.user_id);
+
+      return {
+        user: user,
+        player: player
+      };
+    });
+
+    
+
+    res.render('ended_contest_ranklist', {
+      contest: contest,
+      ranklist: ranklist,
+      problems: problems
+    });
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error', {
+      err: e
+    });
+  }
+});
+
 
 function getDisplayConfig(contest) {
   return {
