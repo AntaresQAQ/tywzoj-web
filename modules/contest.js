@@ -363,13 +363,13 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
         const queryResult = await JudgeState.queryPage(query);
         let max_score = 0;
         for(let item in queryResult) {
-          if (item.score > max_score)
+          if (parseInt(item.score) > max_score)
           {
-            max_score=item.score;
-            player.score_details[problem_id].ended_score=item.score;
+            max_score=parseInt(item.score);
             player.score_details[problem_id].judge_id=item.id;
             player.score_details[problem_id].judge_state=item;
-          }  
+          } 
+          player.score_details[problem_id].ended_score=max_score;
         }
       }
 

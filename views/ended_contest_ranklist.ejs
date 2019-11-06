@@ -58,15 +58,9 @@
                     </td>
                   <% } else { %>
                       <a href="<%= syzoj.utils.makeUrl(['submission', item.player.score_details[problem.id].judge_id]) %>">
-                        <% if (item.player.score_details[problem.id].ended_score != null) { %>
                           <span class="score score_<%= parseInt((item.player.score_details[problem.id].score / 10) || 0) %>">
                             <%= item.player.score_details[problem.id].ended_score %>
                           </span>
-                        <% } else { %>
-                          <span class="status compile_error">
-                            0
-                          </span>
-                        <% } %>
                       </a>
                     </td>
                   <% } %>
