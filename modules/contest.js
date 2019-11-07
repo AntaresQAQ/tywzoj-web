@@ -350,7 +350,7 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
       let player = await ContestPlayer.findById(player_id);
 
       for (let problem_id of problems_id) {
-
+        
         let sql= 'SELECT * FROM `judge_state` WHERE `user_id` = '+ player.user_id
         +' AND `problem_id` = '+ problem_id
         +' AND `score` = (SELECT MAX(`score`) FROM `judge_state` WHERE user_id = '+player.user_id
@@ -358,7 +358,7 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
         
         const queryResult = await JudgeState.query(sql);
         
-        player.score_details[problem_id]={}
+        if(!player.score_details[problem_id]) player.score_details[problem_id]={}
 
         if (queryResult.length) {
           player.score_details[problem_id].judge_id=queryResult[0].id;
@@ -378,7 +378,6 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
     });
 
     
-
     res.render('ended_contest_ranklist', {
       contest: contest,
       ranklist: ranklist,
