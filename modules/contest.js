@@ -349,30 +349,23 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.findById(player_id);
 
-      for (let problem_id in player.score_details) {
-        //player.score_details[problem_id].judge_state = await JudgeState.findById(player.score_details[problem_id].judge_id);
-        // player.score_details[problem_id].judge_state;
-        /*** XXX: Clumsy duplication, see ContestRanklist::updatePlayer() ***/
-        //let multiplier = (contest.ranklist.ranking_params || {})[i] || 1.0;
-        //player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(player.score_details[i].score * multiplier);
-        //player.score += player.score_details[i].weighted_score;
-        
-        let query= JudgeState.createQueryBuilder();
-        query.where("user_id=:user_id", {user_id: player.user_id})
-             .andWhere("problem_id=:problem_id", {problem_id: problem_id});
-        const queryResult = await JudgeState.queryPage(query);
-        let max_score = 0;
-        for(let item in queryResult) {
-          if (parseInt(item.score) > max_score)
-          {
-            max_score=parseInt(item.score);
-            player.score_details[problem_id].judge_id=item.id;
-            player.score_details[problem_id].judge_state=item;
-          } 
-          player.score_details[problem_id].ended_score=max_score;
-        }
-      }
+      for (let problem_id of problems_id) {
 
+        let sql= 'SELECT * FROM `judge_state` WHERE `user_id` = '+ player.user_id
+        +' AND `problem_id` = '+ problem_id
+        +' AND `score` = (SELECT MAX(`score`) FROM `judge_state` WHERE user_id = '+player.user_id
+        +' AND `problem_id` = '+ problem_id +' )';
+        
+        const queryResult = await JudgeState.query(sql);
+        
+        if (queryResult.length) {
+          player.score_details[problem_id].judge_id=queryResult[0].id;
+          player.score_details[problem_id].judge_state=queryResult[0];
+          player.score_details[problem_id].ended_score=queryResult[0].score;
+        } else {
+          player.score_details[problem_id].ended_score=-1;
+        }        
+      }
       let user = await User.findById(player.user_id);
 
       return {
