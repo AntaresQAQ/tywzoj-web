@@ -21,10 +21,15 @@
                 <% } %>
                 <% for (let i = 0; i < problems.length; i++) { %>
                 <th>
+                  <div>
                   <a href="<%= syzoj.utils.makeUrl(['contest', contest.id, 'problem', i + 1]) %>">
                     <!-- <%= syzoj.utils.removeTitleTag(problems[i].title) %> -->
-                    T<%= i + 1 %>
+                    <big> 
+                      T<%= i + 1 %> 
+                    </big>
                   </a>
+                  </div>
+                  <div>比赛/赛后</div>
                 </th>
                 <% } %>
             </tr>
@@ -48,8 +53,15 @@
                   <% if (item.player.ended_score_details[problem.id].ended_score === -1) { %>
                     未提交  
                   </td>
-                  <% } else { %>
-                      <a href="<%= syzoj.utils.makeUrl(['submission', item.player.ended_score_details[problem.id].judge_id]) %>">
+                  <% } else { 
+                    if(item.player.score_details[problem.id]) { %>
+                    <a href="<%= syzoj.utils.makeUrl(['submission', item.player.score_details[problem.id].judge_id]) %>">
+                      <span class="score score_<%= parseInt((item.player.score_details[problem.id].score / 10) || 0) %>">
+                        <%= item.player.score_details[problem.id].score %>
+                      </span>
+                    </a> / 
+                    <% } %>
+                    <a href="<%= syzoj.utils.makeUrl(['submission', item.player.ended_score_details[problem.id].judge_id]) %>">
                           <span class="score score_<%= parseInt((item.player.ended_score_details[problem.id].ended_score / 10) || 0) %>">
                             <%= item.player.ended_score_details[problem.id].ended_score %>
                           </span>

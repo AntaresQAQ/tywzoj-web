@@ -349,6 +349,18 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.findById(player_id);
       player.ended_score_details={}
+      
+      for (let i in player.score_details) {
+        player.score_details[i].judge_state = await JudgeState.findById(player.score_details[i].judge_id);
+
+        /*** XXX: Clumsy duplication, see ContestRanklist::updatePlayer() ***/
+        if (contest.type === 'noi' || contest.type === 'ioi') {
+          let multiplier = (contest.ranklist.ranking_params || {})[i] || 1.0;
+          player.score_details[i].weighted_score = player.score_details[i].score == null ? null : Math.round(player.score_details[i].score * multiplier);
+          player.score += player.score_details[i].weighted_score;
+        }
+      }
+      
       for (let problem_id of problems_id) {
         
         let sql= 'SELECT * FROM `judge_state` WHERE `user_id` = '+ player.user_id
