@@ -358,8 +358,11 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
         
         const queryResult = await JudgeState.query(sql);
         
+        player.score_details[problem_id]={}
+
         if (queryResult.length) {
           player.score_details[problem_id].judge_id=queryResult[0].id;
+          player.score_details[problem_id].qwq=queryResult[0].id;
           player.score_details[problem_id].judge_state=queryResult[0];
           player.score_details[problem_id].ended_score=queryResult[0].score;
         } else {
