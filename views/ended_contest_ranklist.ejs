@@ -54,13 +54,13 @@
                 <td><% if (item.user.nickname) { %><%- item.user.nickname %><% } %></td>
                 <% for (let problem of problems) { %>
                   <td>
-                  <% if (item.player.score_details[problem.id].ended_score === -1) { %>
+                  <% if (item.player.ended_score_details[problem.id].ended_score === -1) { %>
                     未提交  
                   </td>
                   <% } else { %>
-                      <a href="<%= syzoj.utils.makeUrl(['submission', item.player.score_details[problem.id].judge_id]) %>">
-                          <span class="score score_<%= parseInt((item.player.score_details[problem.id].ended_score / 10) || 0) %>">
-                            <%= item.player.score_details[problem.id].ended_score %>
+                      <a href="<%= syzoj.utils.makeUrl(['submission', item.player.ended_score_details[problem.id].judge_id]) %>">
+                          <span class="score score_<%= parseInt((item.player.ended_score_details[problem.id].ended_score / 10) || 0) %>">
+                            <%= item.player.ended_score_details[problem.id].ended_score %>
                           </span>
                       </a>
                     </td>

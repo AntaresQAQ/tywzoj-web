@@ -348,7 +348,7 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
 
     let ranklist = await players_id.mapAsync(async player_id => {
       let player = await ContestPlayer.findById(player_id);
-
+      player.ended_score_details={}
       for (let problem_id of problems_id) {
         
         let sql= 'SELECT * FROM `judge_state` WHERE `user_id` = '+ player.user_id
@@ -358,15 +358,15 @@ app.get('/contest/:id/endedranklist', async (req, res) => {
         
         const queryResult = await JudgeState.query(sql);
         
-        if(!player.score_details[problem_id]) player.score_details[problem_id]={}
+        player.ended_score_details[problem_id]={}
 
         if (queryResult.length) {
-          player.score_details[problem_id].judge_id=queryResult[0].id;
-          player.score_details[problem_id].qwq=queryResult[0].id;
-          player.score_details[problem_id].judge_state=queryResult[0];
-          player.score_details[problem_id].ended_score=queryResult[0].score;
+          player.ended_score_details[problem_id].judge_id=queryResult[0].id;
+          player.ended_score_details[problem_id].qwq=queryResult[0].id;
+          player.ended_score_details[problem_id].judge_state=queryResult[0];
+          player.ended_score_details[problem_id].ended_score=queryResult[0].score;
         } else {
-          player.score_details[problem_id].ended_score=-1;
+          player.ended_score_details[problem_id].ended_score=-1;
         }        
       }
       let user = await User.findById(player.user_id);
