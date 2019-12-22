@@ -55,12 +55,8 @@
                         <a href="<%= syzoj.utils.makeUrl(['submission', item.player.score_details[problem.id].judge_id]) %>">
                           <% if (item.player.score_details[problem.id].accepted) { %>
                             <span class="score score_10">
-                              <% if (item.player.score_details[problem.id].unacceptedCount) { %>
-                                +<%= item.player.score_details[problem.id].unacceptedCount %>
-                              <% } else { %>
-                                +
-                              <% } %>
-                              </span>
+                              AC
+                            </span>
                           <% } else if (item.player.score_details[problem.id].unacceptedCount) { %>
                             <span class="score score_0">
                               -<%= item.player.score_details[problem.id].unacceptedCount %>
