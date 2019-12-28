@@ -88,7 +88,7 @@
                 </td>
                 <% if (isSupervisior && isEnded) { %>
                   <td>
-                    <div class="ui basic modal" id="modal-delete">
+                    <div class="ui basic modal" id="modal-delete<%= item.player.id %>">
                       <div class="ui icon header">
                         <p style="margin-top: 15px; ">取消用户成绩？</p>
                       </div>
@@ -107,7 +107,7 @@
                         </a>
                       </div>
                     </div>
-                    <i class="red remove icon" onclick="$('#modal-delete').modal('show')"></i>
+                    <i class="red remove icon" onclick="$('#modal-delete<%= item.player.id %>').modal('show')"></i>
                   </td>
                 <% } %>
                 <td><a href="<%= syzoj.utils.makeUrl(['user', item.user.id]) %>"><%= item.user.username %></a><% if (item.user.nameplate) { %><%- item.user.nameplate %><% } %></td>
