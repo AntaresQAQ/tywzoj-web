@@ -13,6 +13,9 @@
             <thead>
             <tr>
                 <th>#</th>
+                <% if (isSupervisior && isEnded) { %>
+                  <th>移除</th>
+                <% } %>
                 <th>用户名</th>
                 <th>昵称/备注名</th>
                 <% if (contest.type === 'acm') { %>
@@ -83,6 +86,11 @@
                   <%= rank %>
                   </div>
                 </td>
+                <% if (isSupervisior && isEnded) { %>
+                  <td><a href-post="<%= syzoj.utils.makeUrl(['contest', contest.id, 'cancel', item.player.id]) %>" >
+                    <i class="red remove icon"></i>
+                  </a></td>
+                <% } %>
                 <td><a href="<%= syzoj.utils.makeUrl(['user', item.user.id]) %>"><%= item.user.username %></a><% if (item.user.nameplate) { %><%- item.user.nameplate %><% } %></td>
                 <td><% if (item.user.nickname) { %><%- item.user.nickname %><% } %></td>
                 <% if (contest.type === 'acm') { %>

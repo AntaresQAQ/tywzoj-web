@@ -28,6 +28,9 @@ export default class ContestPlayer extends Model {
   @TypeORM.Column({ nullable: true, type: "integer" })
   time_spent: number;
 
+  @TypeORM.Column({ nullable: true, type: "boolean", default:false })
+  is_canceled: boolean;
+
   user?: User;
   contest?: Contest;
 

@@ -277,6 +277,7 @@ app.get('/contest/:id/ranklist', async (req, res) => {
         let player_id = contest.ranklist.ranklist[i];
         let player =await ContestPlayer.findById(player_id);
         if(!await User.findById(player.user_id)) continue;
+        if(player.is_canceled) continue;
         players_id.push(player_id);
     }
 
@@ -308,15 +309,47 @@ app.get('/contest/:id/ranklist', async (req, res) => {
 
     let problems_id = await contest.getProblems();
     let problems = await problems_id.mapAsync(async id => await Problem.findById(id));
+    
+    const isSupervisior = await contest.isSupervisior(curUser);
 
     res.render('contest_ranklist', {
       contest: contest,
       ranklist: ranklist,
-      problems: problems
+      problems: problems,
+      isSupervisior: isSupervisior,
+      isEnded: contest.isEnded()
     });
   } catch (e) {
     syzoj.log(e);
     res.render('error', {
+      err: e
+    });
+  }
+});
+
+app.post('/contest/:id/cancel/:player_id', async(req, res) =>{
+  try{
+    let contest_id = parseInt(req.params.id);
+    let contest = await Contest.findById(contest_id);
+    let player_id = parseInt(req.params.player_id);
+    const curUser = res.locals.user;
+    const isSupervisior = await contest.isSupervisior(curUser);
+    if (!contest) throw new ErrorMessage('无此比赛。');
+    if (!contest.is_public && (!res.locals.user || !(await res.locals.user.hasPrivilege('manage_contest')))) throw new ErrorMessage('比赛未公开，请耐心等待 (´∀ `)');
+    if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
+    if(!isSupervisior) throw new ErrorMessage('您没有权限进行此操作。');
+    if(!contest.isEnded()) throw new ErrorMessage('请在比赛结束后操作。');
+    //let sql = "UPDATE `contest_player` SET `is_canceled` = 1 WHERE `contest_id`= "+ contest_id +" AND `id` = "+ player_id;
+    //await JudgeState.query(sql);
+    let player = await ContestPlayer.findById(player_id);
+    if(!player) throw new ErrorMessage('用户不存在。');
+    player.is_canceled = 1;
+    player.save();
+    res.redirect(syzoj.utils.makeUrl(['contest',contest_id,'ranklist']));
+
+  } catch (e) {
+    syzoj.log(e);
+    res.render('error',{
       err: e
     });
   }
