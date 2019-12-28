@@ -87,9 +87,28 @@
                   </div>
                 </td>
                 <% if (isSupervisior && isEnded) { %>
-                  <td><a href-post="<%= syzoj.utils.makeUrl(['contest', contest.id, 'cancel', item.player.id]) %>" >
-                    <i class="red remove icon"></i>
-                  </a></td>
+                  <td>
+                    <div class="ui basic modal" id="modal-delete">
+                      <div class="ui icon header">
+                        <p style="margin-top: 15px; ">取消用户成绩？</p>
+                      </div>
+                      <div class="content" style="text-align: center; ">
+                        <p>此操作不可逆！！！慎重！</p>
+                      </div>
+                      <div class="actions">
+                        <div class="ui red basic cancel inverted button">
+                          <i class="remove icon"></i>
+                          否
+                        </div>
+                        <a class="ui green ok inverted button"
+                          href-post="<%= syzoj.utils.makeUrl(['contest', contest.id, 'cancel', item.player.id]) %>">
+                          <i class="checkmark icon"></i>
+                          是
+                        </a>
+                      </div>
+                    </div>
+                    <i class="red remove icon" onclick="$('#modal-delete').modal('show')"></i>
+                  </td>
                 <% } %>
                 <td><a href="<%= syzoj.utils.makeUrl(['user', item.user.id]) %>"><%= item.user.username %></a><% if (item.user.nameplate) { %><%- item.user.nameplate %><% } %></td>
                 <td><% if (item.user.nickname) { %><%- item.user.nickname %><% } %></td>
