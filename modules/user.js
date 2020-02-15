@@ -205,6 +205,7 @@ app.post('/user/:id/edit', async (req, res) => {
       if (!syzoj.utils.isValidUsername(req.body.username)) throw new ErrorMessage('无效的用户名。');
       user.username = req.body.username;
       user.email = req.body.email;
+      user.is_available = (req.body.is_available === 'on');
     }
 
     if (res.locals.user && res.locals.user.is_admin) {
@@ -219,7 +220,6 @@ app.post('/user/:id/edit', async (req, res) => {
     }
 
     if (res.locals.user && res.locals.user.is_admin) {
-      user.is_available = (req.body.is_available === 'on');
       user.download_data = (req.body.download_data === 'on');
     }
 
