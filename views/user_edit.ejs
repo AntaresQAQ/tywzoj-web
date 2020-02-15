@@ -84,9 +84,9 @@
           <input disabled="disabled" type="checkbox" <% if (edited_user.is_admin) { %> checked <% } %>>
           <label>全站管理员</label>
         </div>
-        <div class="ui toggle <% if (!allowedManageUser) { %>disabled <% } %>checkbox"
+        <div class="ui toggle <% if (!allowedManageUser || edited_user.is_admin) { %>disabled <% } %>checkbox"
           style="margin-right: 20px; ">
-          <input id="is_available" name="is_available" <% if (!allowedManageUser) { %>disabled="disabled"
+          <input id="is_available" name="is_available" <% if (!allowedManageUser || edited_user.is_admin) { %>disabled="disabled"
             <% } %>type="checkbox" <% if (edited_user.is_available) { %> checked <% } %>>
           <label>账号可用</label>
         </div>
