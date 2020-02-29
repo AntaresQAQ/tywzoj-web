@@ -160,6 +160,7 @@ export default class Contest extends Model {
     await entityManager.query('DELETE FROM `contest_ranklist`     WHERE `id` = ' + this.ranklist_id);
     await entityManager.query('DELETE FROM `contest_player`       WHERE `contest_id` = ' + this.id);
     await entityManager.query('DELETE FROM `contest`              WHERE `id` = ' + this.id);
+    await entityManager.query('DELETE FROM `rating_calculation`   WHERE `contest_id` = ' + this.id);
 
     await this.destroy();
   }
