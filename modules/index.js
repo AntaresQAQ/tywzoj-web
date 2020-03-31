@@ -2,7 +2,7 @@ let User = syzoj.model('user');
 let Article = syzoj.model('article');
 let Contest = syzoj.model('contest');
 let Problem = syzoj.model('problem');
-let Divine = require('syzoj-divine');
+let Divine = syzoj.lib('divine');
 let TimeAgo = require('javascript-time-ago');
 let zh = require('../libs/timeago');
 TimeAgo.locale(zh);
@@ -16,7 +16,7 @@ app.get('/', async (req, res) => {
     await ranklist.forEachAsync(async x => x.renderInformation());
 
     let notices = (await Article.find({
-      where: { is_notice: true }, 
+      where: { is_notice: true },
       order: { public_time: 'DESC' }
     })).map(article => ({
       title: article.title,
