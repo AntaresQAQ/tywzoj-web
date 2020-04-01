@@ -10,7 +10,8 @@ const timeAgo = new TimeAgo('zh-CN');
 
 app.get('/', async (req, res) => {
   try {
-    if(!res.locals.user){
+    let date = new Date();
+    if(!res.locals.user && date.getMonth() + 1 === 4 && date.getDate() === 1){
       res.render("fool");
       return;
     }

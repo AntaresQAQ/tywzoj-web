@@ -9,11 +9,13 @@
           登录
         </div>
       </h2>
+        <% date = new Date()
+           if(date.getMonth()+1 === 4 && date.getDate()===1) { %>
         <h2>
             <div class="content" style="margin-bottom: 10px; color:green">
                 愚人节快乐！
             </div>
-        </h2>
+        </h2><% } %>
       <form class="ui large form">
         <div class="ui existing segment">
           <div class="field">
