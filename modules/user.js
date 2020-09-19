@@ -7,15 +7,15 @@ const ContestPlayer = syzoj.model('contest_player');
 // Ranklist
 app.get('/ranklist', async (req, res) => {
   try {
-    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', {'登录': syzoj.utils.makeUrl(['login'], {'url': req.originalUrl})});
     if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const sort = req.query.sort || syzoj.config.sorting.ranklist.field;
     const order = req.query.order || syzoj.config.sorting.ranklist.order;
     if (!['ac_num', 'rating', 'id', 'username'].includes(sort) || !['asc', 'desc'].includes(order)) {
       throw new ErrorMessage('错误的排序参数。');
     }
-    let paginate = syzoj.utils.paginate(await User.countForPagination({ is_show: true }), req.query.page, syzoj.config.page.ranklist);
-    let ranklist = await User.queryPage(paginate, { is_show: true }, { [sort]: order.toUpperCase() });
+    let paginate = syzoj.utils.paginate(await User.countForPagination({is_show: true}), req.query.page, syzoj.config.page.ranklist);
+    let ranklist = await User.queryPage(paginate, {is_show: true}, {[sort]: order.toUpperCase()});
     await ranklist.forEachAsync(async x => x.renderInformation());
 
     res.render('ranklist', {
@@ -48,15 +48,15 @@ app.get('/find_user', async (req, res) => {
 // userlist
 app.get('/userlist', async (req, res) => {
   try {
-    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', {'登录': syzoj.utils.makeUrl(['login'], {'url': req.originalUrl})});
     if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const sort = req.query.sort || syzoj.config.sorting.userlist.field;
     const order = req.query.order || syzoj.config.sorting.userlist.order;
     if (!['register_time', 'id', 'username'].includes(sort) || !['asc', 'desc'].includes(order)) {
       throw new ErrorMessage('错误的排序参数。');
     }
-    let paginate = syzoj.utils.paginate(await User.countForPagination({ is_show: true }), req.query.page, syzoj.config.page.userlist);
-    let userlist = await User.queryPage(paginate, { is_show: true }, { [sort]: order.toUpperCase() });
+    let paginate = syzoj.utils.paginate(await User.countForPagination({is_show: true}), req.query.page, syzoj.config.page.userlist);
+    let userlist = await User.queryPage(paginate, {is_show: true}, {[sort]: order.toUpperCase()});
     await userlist.forEachAsync(async x => x.renderInformation());
 
     res.render('userlist', {
@@ -77,7 +77,7 @@ app.get('/userlist', async (req, res) => {
 app.get('/login', async (req, res) => {
   if (res.locals.user) {
     res.render('error', {
-      err: new ErrorMessage('您已经登录了，请先注销。', { '注销': syzoj.utils.makeUrl(['logout'], { 'url': req.originalUrl }) })
+      err: new ErrorMessage('您已经登录了，请先注销。', {'注销': syzoj.utils.makeUrl(['logout'], {'url': req.originalUrl})})
     });
   } else {
     res.render('login');
@@ -88,7 +88,7 @@ app.get('/login', async (req, res) => {
 app.get('/sign_up', async (req, res) => {
   if (res.locals.user) {
     res.render('error', {
-      err: new ErrorMessage('您已经登录了，请先注销。', { '注销': syzoj.utils.makeUrl(['logout'], { 'url': req.originalUrl }) })
+      err: new ErrorMessage('您已经登录了，请先注销。', {'注销': syzoj.utils.makeUrl(['logout'], {'url': req.originalUrl})})
     });
   } else {
     res.render('sign_up');
@@ -105,7 +105,7 @@ app.post('/logout', async (req, res) => {
 // User page
 app.get('/user/:id', async (req, res) => {
   try {
-    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', { '登录': syzoj.utils.makeUrl(['login'], { 'url': req.originalUrl }) });
+    if (!res.locals.user) throw new ErrorMessage('请登录后继续。', {'登录': syzoj.utils.makeUrl(['login'], {'url': req.originalUrl})});
     let id = parseInt(req.params.id);
     let user = await User.findById(id);
     if (!user) throw new ErrorMessage('无此用户。');
@@ -118,8 +118,8 @@ app.get('/user/:id', async (req, res) => {
     user.emailVisible = user.public_email || user.allowedEdit;
 
     const ratingHistoryValues = await RatingHistory.find({
-      where: { user_id: user.id },
-      order: { rating_calculation_id: 'ASC' }
+      where: {user_id: user.id},
+      order: {rating_calculation_id: 'ASC'}
     });
     const ratingHistories = [{
       contestName: "初始积分",
@@ -135,7 +135,7 @@ app.get('/user/:id', async (req, res) => {
         value: history.rating_after,
         delta: history.rating_after - ratingHistories[ratingHistories.length - 1].value,
         rank: history.rank,
-        participants: await ContestPlayer.count({ contest_id: contest.id })
+        participants: await ContestPlayer.count({contest_id: contest.id})
       });
     }
     ratingHistories.reverse();
@@ -185,7 +185,6 @@ app.get('/forget', async (req, res) => {
 });
 
 
-
 app.post('/user/:id/edit', async (req, res) => {
   let user;
   try {
@@ -205,6 +204,7 @@ app.post('/user/:id/edit', async (req, res) => {
       if (!syzoj.utils.isValidUsername(req.body.username)) throw new ErrorMessage('无效的用户名。');
       user.username = req.body.username;
       user.email = req.body.email;
+      user.level = parseInt(req.body.level) || 0;
     }
 
     if (res.locals.user && res.locals.user.is_admin) {
@@ -264,8 +264,8 @@ app.post('/user/:id/delete', async (req, res) => {
     if (!user.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
 
     //await user.delete();
-    user.is_show=false;
-    user.is_available=false;
+    user.is_show = false;
+    user.is_available = false;
     await user.save();
 
     res.redirect('/');

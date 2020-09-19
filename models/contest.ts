@@ -21,46 +21,50 @@ export default class Contest extends Model {
   @TypeORM.PrimaryGeneratedColumn()
   id: number;
 
-  @TypeORM.Column({ nullable: true, type: "varchar", length: 80 })
+  @TypeORM.Column({nullable: true, type: "varchar", length: 80})
   title: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   subtitle: string;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   start_time: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   end_time: number;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   holder_id: number;
 
   // type: noi, ioi, acm
-  @TypeORM.Column({ nullable: true, type: "enum", enum: ContestType })
+  @TypeORM.Column({nullable: true, type: "enum", enum: ContestType})
   type: ContestType;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   information: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   problems: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   admins: string;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   ranklist_id: number;
 
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Column({nullable: true, type: "boolean"})
   is_public: boolean;
 
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Index()
+  @TypeORM.Column({nullable: true, type: "integer", default: 0})
+  allow_level: number;
+
+  @TypeORM.Column({nullable: true, type: "boolean"})
   hide_statistics: boolean;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   category: string;
 
   holder?: User;

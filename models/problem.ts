@@ -9,7 +9,7 @@ import JudgeState from "./judge_state";
 import Contest from "./contest";
 import ProblemTag from "./problem_tag";
 import ProblemTagMap from "./problem_tag_map";
-import SubmissionStatistics, { StatisticsType } from "./submission_statistics";
+import SubmissionStatistics, {StatisticsType} from "./submission_statistics";
 
 import * as fs from "fs-extra";
 import * as path from "path";
@@ -46,70 +46,75 @@ export default class Problem extends Model {
   @TypeORM.PrimaryGeneratedColumn()
   id: number;
 
-  @TypeORM.Column({ nullable: true, type: "varchar", length: 80 })
+  @TypeORM.Column({nullable: true, type: "varchar", length: 80})
   title: string;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   user_id: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   publicizer_id: number;
 
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Column({nullable: true, type: "boolean"})
   is_anonymous: boolean;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   description: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   input_format: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   output_format: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   example: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   limit_and_hint: string;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   time_limit: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   memory_limit: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   additional_file_id: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   ac_num: number;
 
-  @TypeORM.Column({ nullable: true, type: "integer" })
+  @TypeORM.Column({nullable: true, type: "integer"})
   submit_num: number;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Column({nullable: true, type: "boolean"})
   is_public: boolean;
 
-  @TypeORM.Column({ nullable: true, type: "boolean" })
+  @TypeORM.Index()
+  @TypeORM.Column({nullable: true, type: "integer", default: 0})
+  allow_level: number;
+
+  @TypeORM.Column({nullable: true, type: "boolean"})
   file_io: boolean;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   file_io_input_name: string;
 
-  @TypeORM.Column({ nullable: true, type: "text" })
+  @TypeORM.Column({nullable: true, type: "text"})
   file_io_output_name: string;
 
   @TypeORM.Index()
-  @TypeORM.Column({ nullable: true, type: "datetime" })
+  @TypeORM.Column({nullable: true, type: "datetime"})
   publicize_time: Date;
 
-  @TypeORM.Column({ nullable: true,
-      type: "enum",
-      enum: ProblemType,
-      default: ProblemType.Traditional
+  @TypeORM.Column({
+    nullable: true,
+    type: "enum",
+    enum: ProblemType,
+    default: ProblemType.Traditional
   })
   type: ProblemType;
 
@@ -168,7 +173,7 @@ export default class Problem extends Model {
 
       let execFileAsync = util.promisify(require('child_process').execFile);
       await execFileAsync(__dirname + '/../bin/unzip', ['-j', '-o', '-d', dir, path]);
-      await fs.move(path, this.getTestdataArchivePath(), { overwrite: true });
+      await fs.move(path, this.getTestdataArchivePath(), {overwrite: true});
     });
   }
 
@@ -189,10 +194,13 @@ export default class Problem extends Model {
       if (!noLimit && oldSize + size > syzoj.config.limit.testdata) throw new ErrorMessage('数据包太大。');
       if (!noLimit && oldCount + (!replace as any as number) > syzoj.config.limit.testdata_filecount) throw new ErrorMessage('数据包中的文件太多。');
 
-      await fs.move(filepath, path.join(dir, filename), { overwrite: true });
+      await fs.move(filepath, path.join(dir, filename), {overwrite: true});
 
       let execFileAsync = util.promisify(require('child_process').execFile);
-      try { await execFileAsync('dos2unix', [path.join(dir, filename)]); } catch (e) {}
+      try {
+        await execFileAsync('dos2unix', [path.join(dir, filename)]);
+      } catch (e) {
+      }
 
       await fs.remove(this.getTestdataArchivePath());
     });
@@ -334,8 +342,8 @@ export default class Problem extends Model {
 
   async resetSubmissionCount() {
     await syzoj.utils.lock(['Problem::resetSubmissionCount', this.id], async () => {
-      this.submit_num = await JudgeState.count({ problem_id: this.id, type: TypeORM.Not(1) });
-      this.ac_num = await JudgeState.count({ score: 100, problem_id: this.id, type: TypeORM.Not(1) });
+      this.submit_num = await JudgeState.count({problem_id: this.id, type: TypeORM.Not(1)});
+      this.ac_num = await JudgeState.count({score: 100, problem_id: this.id, type: TypeORM.Not(1)});
       await this.save();
     });
   }
@@ -347,13 +355,13 @@ export default class Problem extends Model {
       await syzoj.utils.lock(['Problem::UpdateStatistics', this.id, type], async () => {
         const [column, order] = statisticsTypes[type];
         const result = await JudgeState.createQueryBuilder()
-                                       .select([column, "id"])
-                                       .where("user_id = :user_id", { user_id })
-                                       .andWhere("status = :status", { status: "Accepted" })
-                                       .andWhere("problem_id = :problem_id", { problem_id: this.id })
-                                       .orderBy({ [column]: order })
-                                       .take(1)
-                                       .getRawMany();
+          .select([column, "id"])
+          .where("user_id = :user_id", {user_id})
+          .andWhere("status = :status", {status: "Accepted"})
+          .andWhere("problem_id = :problem_id", {problem_id: this.id})
+          .orderBy({[column]: order})
+          .take(1)
+          .getRawMany();
         const resultRow = result[0];
 
         let toDelete = false;
@@ -422,19 +430,19 @@ export default class Problem extends Model {
     })).map(x => x.submission_id);
 
     statistics.judge_state = ids.length ? await JudgeState.createQueryBuilder()
-                                                          .whereInIds(ids)
-                                                          .orderBy(`FIELD(id,${ids.join(',')})`)
-                                                          .getMany()
-                                        : [];
+        .whereInIds(ids)
+        .orderBy(`FIELD(id,${ids.join(',')})`)
+        .getMany()
+      : [];
 
     const a = await JudgeState.createQueryBuilder()
-                              .select('score')
-                              .addSelect('COUNT(*)', 'count')
-                              .where('problem_id = :problem_id', { problem_id: this.id })
-                              .andWhere('type = 0')
-                              .andWhere('pending = false')
-                              .groupBy('score')
-                              .getRawMany();
+      .select('score')
+      .addSelect('COUNT(*)', 'count')
+      .where('problem_id = :problem_id', {problem_id: this.id})
+      .andWhere('type = 0')
+      .andWhere('pending = false')
+      .groupBy('score')
+      .getRawMany();
 
     let scoreCount = [];
     for (let score of a) {
@@ -451,7 +459,7 @@ export default class Problem extends Model {
 
     statistics.scoreDistribution = [];
     for (let i = 0; i < scoreCount.length; i++) {
-      if (scoreCount[i] !== undefined) statistics.scoreDistribution.push({ score: i, count: parseInt(scoreCount[i]) });
+      if (scoreCount[i] !== undefined) statistics.scoreDistribution.push({score: i, count: parseInt(scoreCount[i])});
     }
 
     statistics.prefixSum = DeepCopy(statistics.scoreDistribution);

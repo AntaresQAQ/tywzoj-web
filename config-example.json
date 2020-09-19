@@ -40,9 +40,9 @@
       "field": "rating",
       "order": "desc"
     },
-    "userlist":{
-      "field":"id",
-      "order":"asc"
+    "userlist": {
+      "field": "id",
+      "order": "asc"
     },
     "problem": {
       "field": "id",
@@ -134,5 +134,6 @@
   "site_for_download": "",
   "renderer_cache_size": "30000",
   "icon_url": "",
-  "filing_information": ""
+  "filing_information": "",
+  "max_level": 6
 }

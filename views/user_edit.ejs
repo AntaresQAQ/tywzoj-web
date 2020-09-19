@@ -3,20 +3,24 @@
 <% include monaco-editor %>
 <div class="padding">
   <div class="ui <% if (error_info === '') { %>success<% } else { %>error<% } %> message" id="error"
-    <% if (error_info === null) { %>hidden<% } %>>
+       <% if (error_info === null) { %>hidden
+    <% } %>
+  >
     <% if (error_info !== null) {
-          if (error_info === '') error_info = '修改成功。';
-      %>
+      if (error_info === '') error_info = '修改成功。';
+    %>
     <p id="error_info"><%= error_info %></p>
     <% } %>
   </div>
   <form id="form" action="<%= syzoj.utils.makeUrl(['user', edited_user.id, 'edit']) %>" method="post"
-    onsubmit="return check()">
+        onsubmit="return check()">
     <div class="ui form">
       <div class="field">
         <label for="username">用户名</label>
         <input type="text" id="username" name="username" value="<%= edited_user.username %>"
-          <% if (!user.allowedManage) { %> readonly <% } %> >
+        <% if (!user.allowedManage) { %> readonly
+          <% } %>
+        >
       </div>
       <div class="field">
         <label for="username">昵称/备注名</label>
@@ -25,21 +29,26 @@
       <div class="field">
         <label for="sex">性别</label>
         <select class="ui dropdown" name="sex">
-          <option value="0" <%= edited_user.sex == 0 ? 'selected': '' %>>其它</option>
-          <option value="1" <%= edited_user.sex == 1 ? 'selected': '' %>>男</option>
-          <option value="-1" <%= edited_user.sex == -1 ? 'selected': '' %>>女</option>
+          <option value="0" <%= edited_user.sex == 0 ? 'selected' : '' %>>其它</option>
+          <option value="1" <%= edited_user.sex == 1 ? 'selected' : '' %>>男</option>
+          <option value="-1" <%= edited_user.sex == -1 ? 'selected' : '' %>>女</option>
         </select>
       </div>
       <div class="field">
         <label for="email">Email</label>
         <input class="font-content" type="email" id="email" name="email" value="<%= edited_user.email %>"
-          <% if (!user.allowedManage) { %> readonly <% } %>>
+        <% if (!user.allowedManage) { %> readonly
+          <% } %>
+        >
       </div>
       <div class="inline field">
         <label class="ui header">公开 Email</label>
         <div class="ui toggle checkbox">
-          <input id="public_email" name="public_email" type="checkbox" <% if (edited_user.public_email) { %>
-            checked <% } %>>
+          <input id="public_email" name="public_email" type="checkbox"
+          <% if (edited_user.public_email) { %>
+                 checked
+            <% } %>
+          >
           <label>　</label>
         </div>
       </div>
@@ -47,7 +56,9 @@
         <label class="ui header">默认显示格式化后的代码（如果可用）</label>
         <div class="ui toggle checkbox">
           <input id="prefer_formatted_code" name="prefer_formatted_code" type="checkbox"
-            <% if (edited_user.prefer_formatted_code) { %> checked <% } %>>
+          <% if (edited_user.prefer_formatted_code) { %> checked
+            <% } %>
+          >
           <label>　</label>
         </div>
       </div>
@@ -78,76 +89,118 @@
       let allowedManagePrivilege = user && user.is_admin;
       let allowedManageUser = user && user.allowedManage;
       %>
-      <div class="inline field">
+      <div class="field" style="width: 60px">
+        <label class="ui header ">用户等级</label>
+        <div class="ui <% if(!allowedManageUser) { %>read-only <% } %>left labeled right labeled input">
+          <button id="level-less" onclick="levelLess()" type="button"
+                  class="ui <% if(edited_user.level === 0) { %>disabled <% } %>green button label"
+                  <% if(!allowedManageUser) { %>disabled
+            <% } %>
+          >-
+          </button>
+          <input id="level" name="level" type="text" style="text-align: center"
+                 value="<%= edited_user.level %>"
+                 <% if(!allowedManageUser) { %>readonly
+            <% } %>
+          >
+          <button id="level-add" onclick="levelAdd()" type="button"
+                  class="ui <% if(edited_user.level === serializejs(syzoj.config.max_level)) { %>disabled <% } %>red button label"
+                  <% if(!allowedManageUser) { %>disabled
+            <% } %>
+          >+
+          </button>
+        </div>
+      </div>
+      <div class="inline field ">
         <label class="ui header">权限</label>
         <div class="ui toggle disabled checkbox" style="margin-right: 20px; ">
-          <input disabled="disabled" type="checkbox" <% if (edited_user.is_admin) { %> checked <% } %>>
+          <input disabled="disabled" type="checkbox"
+          <% if (edited_user.is_admin) { %> checked
+            <% } %>
+          >
           <label>全站管理员</label>
         </div>
         <div class="ui toggle <% if (!allowedManageUser || edited_user.is_admin) { %>disabled <% } %>checkbox"
-          style="margin-right: 20px; ">
-          <input id="is_available" name="is_available" <% if (!allowedManageUser || edited_user.is_admin) { %>disabled="disabled"
-            <% } %>type="checkbox" <% if (edited_user.is_available) { %> checked <% } %>>
+             style="margin-right: 20px; ">
+          <input id="is_available" name="is_available"
+                 <% if (!allowedManageUser || edited_user.is_admin) { %>disabled="disabled"
+                 <% } %>type="checkbox"
+          <% if (edited_user.is_available) { %> checked
+            <% } %>
+          >
           <label>账号可用</label>
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege"
-          data-name="manage_problem" style="margin-right: 20px; ">
+             data-name="manage_problem" style="margin-right: 20px; ">
           <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"
-            <% if (edited_user.privileges.includes('manage_problem')) { %> checked <% } %>>
+          <% if (edited_user.privileges.includes('manage_problem')) { %> checked
+            <% } %>
+          >
           <label>管理题目</label>
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege"
-          data-name="manage_problem_tag" style="margin-right: 20px; ">
+             data-name="manage_problem_tag" style="margin-right: 20px; ">
           <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"
-            <% if (edited_user.privileges.includes('manage_problem_tag')) { %> checked <% } %>>
+          <% if (edited_user.privileges.includes('manage_problem_tag')) { %> checked
+            <% } %>
+          >
           <label>管理题目标签</label>
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege"
-          data-name="manage_contest" style="margin-right: 20px; ">
+             data-name="manage_contest" style="margin-right: 20px; ">
           <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"
-            <% if (edited_user.privileges.includes('manage_contest')) { %> checked <% } %>>
+          <% if (edited_user.privileges.includes('manage_contest')) { %> checked
+            <% } %>
+          >
           <label>管理比赛</label> <!-- 预留给比赛权限 -->
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox checkbox_privilege"
-          data-name="manage_user" style="margin-right: 20px; ">
+             data-name="manage_user" style="margin-right: 20px; ">
           <input <% if (!allowedManagePrivilege) { %>disabled="disabled" <% } %>type="checkbox"
-            <% if (edited_user.privileges.includes('manage_user')) { %> checked <% } %>>
+          <% if (edited_user.privileges.includes('manage_user')) { %> checked
+            <% } %>
+          >
           <label>管理用户</label>
         </div>
         <div class="ui toggle <% if (!allowedManagePrivilege) { %>disabled <% } %>checkbox">
           <input id="download_data" name="download_data" <% if (!allowedManagePrivilege) { %>disabled="disabled"
-            <% } %>type="checkbox" <% if (edited_user.download_data) { %> checked <% } %>>
+                 <% } %>type="checkbox"
+          <% if (edited_user.download_data) { %> checked
+            <% } %>
+          >
           <label>数据下载</label> <!-- 这个比较特殊注意一下，和前面几个不一样 -->
         </div>
       </div>
       <div style="text-align: center; margin-top: 30px; ">
         <button id="submit_button" type="submit" class="ui disabled blue labeled icon button"><i
-            class="ui icon edit"></i>修改</button>
+            class="ui icon edit"></i>修改
+        </button>
         <a href="<%= syzoj.utils.makeUrl(['user', edited_user.id]) %>" class="ui labeled icon button"><i
             class="ui icon angle left"></i>返回</a>
         <% if(allowedManagePrivilege) { %>
-        <div class="ui basic modal" id="modal-delete">
-          <div class="ui icon header">
-            <i class="trash icon"></i>
-            <p style="margin-top: 15px; ">删除用户</p>
-          </div>
-          <div class="content" style="text-align: center; ">
-            <p>确认删除此用户吗？提交记录、评测记录等会一并删除</p>
-          </div>
-          <div class="actions">
-            <div class="ui red basic cancel inverted button">
-              <i class="remove icon"></i>
-              否
+          <div class="ui basic modal" id="modal-delete">
+            <div class="ui icon header">
+              <i class="trash icon"></i>
+              <p style="margin-top: 15px; ">删除用户</p>
             </div>
-            <a class="ui green ok inverted button"
-              href-post="<%= syzoj.utils.makeUrl(['user', edited_user.id, 'delete']) %>">
-              <i class="checkmark icon"></i>
-              是
-            </a>
+            <div class="content" style="text-align: center; ">
+              <p>确认删除此用户吗？提交记录、评测记录等会一并删除</p>
+            </div>
+            <div class="actions">
+              <div class="ui red basic cancel inverted button">
+                <i class="remove icon"></i>
+                否
+              </div>
+              <a class="ui green ok inverted button"
+                 href-post="<%= syzoj.utils.makeUrl(['user', edited_user.id, 'delete']) %>">
+                <i class="checkmark icon"></i>
+                是
+              </a>
+            </div>
           </div>
-        </div>
-        <div class="ui red labeled icon button" onclick="$('#modal-delete').modal('show')"><i
-            class="ui icon trash"></i>删除用户</div>
+          <div class="ui red labeled icon button" onclick="$('#modal-delete').modal('show')"><i
+              class="ui icon trash"></i>删除用户
+          </div>
         <% } %>
       </div>
     </div>
@@ -164,7 +217,7 @@
 </script>
 <script type="text/javascript">
   var editors = {
-    information: { defaultValue: <%- serializejs(edited_user.information) %> },
+    information: {defaultValue: <%- serializejs(edited_user.information) %> },
   };
 
   window.onEditorLoaded(function () {
@@ -183,7 +236,18 @@
       tag.val(md5(tag.val() + "syzoj2_xxx"));
     }
   }
+
   function check() {
+    let level = parseInt($("#level").val());
+    if (isNaN(level) || level < 0 || level > <%- serializejs(syzoj.config.max_level) %>) {
+      $("#error").removeClass("success");
+      $("#error").removeClass("error");
+      $("#error").addClass("error");
+      $("#error_info").html("非法的用户等级");
+      $("#error").show();
+      return false;
+    }
+
     old_password = $("#old_password");
     password1 = $("#password1");
     password2 = $("#password2");
@@ -199,25 +263,52 @@
     make_md5(password1);
     make_md5(password2);
 
-<% if (allowedManagePrivilege) { %>
-      $('.checkbox_privilege').each(function () {
-        if ($(this).checkbox('is checked')) {
-          var name = $(this).data('name');
+    <% if (allowedManagePrivilege) { %>
+    $('.checkbox_privilege').each(function () {
+      if ($(this).checkbox('is checked')) {
+        var name = $(this).data('name');
 
-          var elem = document.createElement('input');
-          elem.type = 'hidden';
-          elem.value = name;
-          elem.name = 'privileges';
-          document.getElementById('form').appendChild(elem);
-        }
-      });
-<% } %>
-	  return true;
+        var elem = document.createElement('input');
+        elem.type = 'hidden';
+        elem.value = name;
+        elem.name = 'privileges';
+        document.getElementById('form').appendChild(elem);
+      }
+    });
+    <% } %>
+    return true;
   }
 </script>
 <script>
   $(function () {
     $('.ui.dropdown:not(.simple)').dropdown();
   });
+  <% if(allowedManageUser) {%>
+  function levelAdd() {
+    let level = parseInt($("#level").val());
+    if (isNaN(level)) level =<%- serializejs(edited_user.level) %>;
+    if (level === 0) {
+      $("#level-less").removeClass("disabled");
+    }
+    level++;
+    if (level === <%- serializejs(syzoj.config.max_level) %>) {
+      $("#level-add").addClass("disabled");
+    }
+    $("#level").val(level);
+  }
+
+  function levelLess() {
+    let level = parseInt($("#level").val());
+    if (isNaN(level)) level =<%- serializejs(edited_user.level) %>;
+    if (level === <%- serializejs(syzoj.config.max_level) %>) {
+      $("#level-add").removeClass("disabled");
+    }
+    level--;
+    if (level === 0) {
+      $("#level-less").addClass("disabled");
+    }
+    $("#level").val(level);
+  }
+  <% } %>
 </script>
 <% include footer %>
