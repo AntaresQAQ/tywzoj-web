@@ -300,12 +300,13 @@ app.get('/problem/:id/edit', async (req, res) => {
       problem = await Problem.create({
         time_limit: syzoj.config.default.problem.time_limit,
         memory_limit: syzoj.config.default.problem.memory_limit,
-        type: 'traditional'
+        type: 'traditional',
       });
       problem.id = id;
       problem.allowedEdit = true;
       problem.tags = [];
       problem.new = true;
+      problem.allow_level = 0;
     } else {
       if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
       if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
@@ -412,6 +413,7 @@ app.get('/problem/:id/import', async (req, res) => {
       });
       problem.id = id;
       problem.new = true;
+      problem.allow_level = 0;
       problem.user_id = res.locals.user.id;
       problem.publicizer_id = res.locals.user.id;
     } else {
@@ -455,9 +457,9 @@ app.post('/problem/:id/import', async (req, res) => {
           problem.id = customID;
         } else if (id) problem.id = id;
       }
-
       problem.user_id = res.locals.user.id;
       problem.publicizer_id = res.locals.user.id;
+      problem.allow_level = parseInt(req.body.allow_level);
     } else {
       if (!await problem.isAllowedUseBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');
       if (!await problem.isAllowedEditBy(res.locals.user)) throw new ErrorMessage('您没有权限进行此操作。');

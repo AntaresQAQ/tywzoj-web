@@ -7,20 +7,67 @@
   </div>
 
   <form class="ui form" action="<%= syzoj.utils.makeUrl(['problem', problem.id, 'import']) %>" method="post">
-      <% if (problem.allowedManage) { %>
-          <div class="field">
-              <label>题目编号</label>
-              <input type="text" name="id" value="<%= problem.id ? problem.id : '' %>" placeholder="留空则自动延伸" <%= problem.new ? '' : 'disabled' %>>
-          </div>
-      <% } %>
+    <% if (problem.allowedManage) { %>
       <div class="field">
-          <label>题目链接</label>
-          <input type="text" name="url" placeholder="如：http://example.com/problem/1">
+        <label>题目编号</label>
+        <input type="text" name="id" value="<%= problem.id ? problem.id : '' %>"
+               placeholder="留空则自动延伸" <%= problem.new ? '' : 'disabled' %>>
       </div>
-      <div style="text-align: center; ">
+    <% } %>
+    <div class="field">
+      <label class="ui header ">允许查看的最低用户等级</label>
+      <div class="ui left labeled right labeled input" style="width: 45px">
+        <button id="level-less" onclick="levelLess()" type="button"
+                class="ui <% if(problem.allow_level === 0) { %>disabled <% } %>green button label">
+          -
+        </button>
+        <input id="allow_level" name="allow_level" type="text" style="text-align: center"
+               value="<%= problem.allow_level %>">
+        <button id="level-add" onclick="levelAdd()" type="button"
+                class="ui <% if(problem.allow_level === syzoj.config.max_level) { %>disabled <% } %>red button label">
+          +
+        </button>
+      </div>
+    </div>
+    <div class="field">
+      <label>题目链接</label>
+      <input type="text" name="url" placeholder="如：http://example.com/problem/1">
+    </div>
+    <div style="text-align: center; ">
       <button type="submit" class="ui labeled submit icon button">
         <i class="icon edit"></i> 提交
       </button>
-      </div>
+    </div>
   </form>
+</div>
+<script>
+  const allow_level = $("#allow_level");
+
+  function levelAdd() {
+
+    let level = parseInt(allow_level.val());
+    if (isNaN(level)) level =<%- serializejs(problem.allow_level) %>;
+    if (level === 0) {
+      $("#level-less").removeClass("disabled");
+    }
+    level++;
+    if (level === <%- serializejs(syzoj.config.max_level) %>) {
+      $("#level-add").addClass("disabled");
+    }
+    allow_level.val(level);
+  }
+
+  function levelLess() {
+    let level = parseInt(allow_level.val());
+    if (isNaN(level)) level =<%- serializejs(problem.allow_level) %>;
+    if (level === <%- serializejs(syzoj.config.max_level) %>) {
+      $("#level-add").removeClass("disabled");
+    }
+    level--;
+    if (level === 0) {
+      $("#level-less").addClass("disabled");
+    }
+    allow_level.val(level);
+  }
+</script>
 <% include footer %>
