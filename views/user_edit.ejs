@@ -104,7 +104,7 @@
             <% } %>
           >
           <button id="level-add" onclick="levelAdd()" type="button"
-                  class="ui <% if(edited_user.level === serializejs(syzoj.config.max_level)) { %>disabled <% } %>red button label"
+                  class="ui <% if(edited_user.level === syzoj.config.max_level) { %>disabled <% } %>red button label"
                   <% if(!allowedManageUser) { %>disabled
             <% } %>
           >+
@@ -283,7 +283,7 @@
   $(function () {
     $('.ui.dropdown:not(.simple)').dropdown();
   });
-  <% if(allowedManageUser) {%>
+  <% if(allowedManageUser) { %>
   function levelAdd() {
     let level = parseInt($("#level").val());
     if (isNaN(level)) level =<%- serializejs(edited_user.level) %>;
