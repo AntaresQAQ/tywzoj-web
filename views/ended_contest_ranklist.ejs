@@ -43,7 +43,7 @@
                   </div>
                 </td>
                 <td><a href="<%= syzoj.utils.makeUrl(['user', item.user.id]) %>"><%= item.user.username %></a><% if (item.user.nameplate) { %><%- item.user.nameplate %><% } %></td>
-                <td><% if (item.user.nickname) { %><%- item.user.nickname %><% } %></td>
+                <td><% if (item.user.nickname) { %><%= item.user.nickname %><% } %></td>
                 <% for (let problem of problems) { %>
                   <td>
                   <% if (item.player.ended_score_details[problem.id].ended_score === -1) { %>
