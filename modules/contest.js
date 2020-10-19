@@ -14,17 +14,19 @@ app.get('/contests', async (req, res) => {
     if (!res.locals.user.is_available) throw new ErrorMessage('您没有权限，请联系管理员授权。');
     const query_category = req.query.category || 'all'
     if (!['junior', 'senior', 'all'].includes(query_category)) throw new ErrorMessage('错误的组别选项。');
-    let where;
-    if (res.locals.user && (await res.locals.user.hasPrivilege('manage_contest'))) where = {}
-    else where = {is_public: true};
-
+    let query = Contest.createQueryBuilder();
     if (query_category === 'junior')
-      where['category'] = "Junior";
+      query.andWhere('category = "Junior"');
     else if (query_category === 'senior')
-      where['category'] = "Senior";
+      query.andWhere('category = "Senior"');
 
-    let paginate = syzoj.utils.paginate(await Contest.countForPagination(where), req.query.page, syzoj.config.page.contest);
-    let contests = await Contest.queryPage(paginate, where, {
+    if (!(await res.locals.user.hasPrivilege('manage_contest'))) {
+      query.andWhere('allow_level <= :allow_level', {allow_level: res.locals.user.level})
+        .andWhere('is_public = 1')
+    }
+
+    let paginate = syzoj.utils.paginate(await Contest.countForPagination(query), req.query.page, syzoj.config.page.contest);
+    let contests = await Contest.queryPage(paginate, query, {
       start_time: 'DESC'
     });
 
